@@ -232,7 +232,7 @@ def shortest_path_first(pathes):
     return sorted(pathes, key=get_path_distnace)
 
 # pop(N)移除第N个元素
-def search(start, destination, connection_grpah, sort_candidate = shortest_path_first):
+def search(start, destination, connection_grpah = simple_connection_info, sort_candidate = shortest_path_first):
     pathes = [[start]]
     visitied = set()
 
@@ -264,6 +264,7 @@ def search(start, destination, connection_grpah, sort_candidate = shortest_path_
 
 print(search('兰州', '福州', simple_connection_info, sort_candidate=shortest_path_first))
 print(search('兰州', '福州', simple_connection_info))
+print(search('兰州', '福州'))
 
 def pretty_print(cities):
     try:
@@ -273,7 +274,7 @@ def pretty_print(cities):
         print('路径未找到，或数据出错')
 
 
-pretty_print(search('北京', '福州', simple_connection_info))
+pretty_print(search('北京', '福州'))
 pretty_print(search('北京', '南京', city_connection, sort_candidate=transfer_stations_first))
 pretty_print(search('北京', '广州', city_connection, sort_candidate=transfer_as_much_possible))
 
