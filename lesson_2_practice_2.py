@@ -209,8 +209,30 @@ bfs(number_grpah, 1)
 # 注意这里西安只连接了兰州和长沙，但是实际太原里的数据也有西安
 nx.draw(nx.Graph(simple_connection_info), city_location, with_labels=True, node_size=10)
 
+
+# 节点最少
+def transfer_stations_first(pathes):
+    return sorted(pathes, key=len)
+# 节点最多
+def transfer_as_much_possible(pathes):
+    return sorted(pathes, key=len, reverse=True)
+
+# 距离最短
+def shortest_path_first(pathes):
+    if len(pathes) <= 1:
+        return pathes
+
+    def get_path_distnace(path):
+        distance = 0
+        # 每一个地点与最后一个地点的距离之和的排序。暂时。
+        for station in path[:-1]:
+            distance += get_geo_distance(station, path[-1])
+        return distance
+
+    return sorted(pathes, key=get_path_distnace)
+
 # pop(N)移除第N个元素
-def search(start, destination, connection_grpah, sort_candidate):
+def search(start, destination, connection_grpah, sort_candidate = shortest_path_first):
     pathes = [[start]]
     visitied = set()
 
@@ -239,28 +261,9 @@ def search(start, destination, connection_grpah, sort_candidate):
         # 会对每次可能的路径排序，优先最短的路径先取出处理
         pathes = sort_candidate(pathes)  # 我们可以加一个排序函数 对我们的搜索策略进行控制
 
-# 节点最少
-def transfer_stations_first(pathes):
-    return sorted(pathes, key=len)
-# 节点最多
-def transfer_as_much_possible(pathes):
-    return sorted(pathes, key=len, reverse=True)
 
-# 距离最短
-def shortest_path_first(pathes):
-    if len(pathes) <= 1:
-        return pathes
-
-    def get_path_distnace(path):
-        distance = 0
-        # 每一个地点与最后一个地点的距离之和的排序。暂时。
-        for station in path[:-1]:
-            distance += get_geo_distance(station, path[-1])
-        return distance
-
-    return sorted(pathes, key=get_path_distnace)
-
-search('兰州', '福州', simple_connection_info, sort_candidate=shortest_path_first)
+print(search('兰州', '福州', simple_connection_info, sort_candidate=shortest_path_first))
+print(search('兰州', '福州', simple_connection_info))
 
 def pretty_print(cities):
     try:
@@ -270,7 +273,7 @@ def pretty_print(cities):
         print('路径未找到，或数据出错')
 
 
-pretty_print(search('北京', '福州', simple_connection_info, sort_candidate=shortest_path_first))
+pretty_print(search('北京', '福州', simple_connection_info))
 pretty_print(search('北京', '南京', city_connection, sort_candidate=transfer_stations_first))
 pretty_print(search('北京', '广州', city_connection, sort_candidate=transfer_as_much_possible))
 
@@ -279,3 +282,6 @@ pretty_print(search('北京', '广州', city_connection, sort_candidate=transfer
 # pretty_print(search('北京', '南京', city_connection))，
 # TypeError: search() missing 1 required positional argument: 'sort_candidate'
 # 问题：通常调用函数时，参数都可以默认。为什么这里一定要填，而如何才能不用填。
+# 解决：函数定义按照先后顺序，search放在transfer_stations_first等方式后面，
+#      然后在search赋值默认函数，后续就可以不用重复书写 sort_candidate=shortest_path_first
+
